@@ -2,7 +2,7 @@ import { makeRequestFavqs } from './makeRequestFavqs'
 import { createSession } from './session'
 import { SuccessLogin, ServerError, UserLogin, SessionDTO } from './types'
 
-interface User {
+export interface User {
   login: string
   pic_url: string
   public_favorites_count: number
@@ -18,13 +18,26 @@ export const createUser = (user: UserLogin) => {
   })
 }
 
+const getUserHelper = (login: string, token: string) => {
+  const userResponse = makeRequestFavqs<User>(`users/${login}`, {
+    headers: { 'User-Token': token },
+  })
+
+  localStorage.setItem('userToken', token)
+  return userResponse
+}
+
 export const getUser = async (user: SessionDTO) => {
+  const userToken = localStorage.getItem('userToken')
+
+  if (userToken) {
+    return getUserHelper(user.login, userToken)
+  }
+
   const response = await createSession(user)
 
   if ('login' in response) {
-    return makeRequestFavqs<User>(`users/${response.login}`, {
-      headers: { 'User-Token': response['User-Token'] },
-    })
+    getUserHelper(response.login, response['User-Token'])
   }
 
   console.log('error_code in session', response)

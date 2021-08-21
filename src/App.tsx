@@ -1,32 +1,39 @@
-import React, { useState, useEffect } from 'react'
-import { SignUp } from './components'
-import { closeSession } from './service/session'
+import React, { useState } from 'react'
+import { Sign, UserPage, Header } from './components'
+import { User } from './service/users'
 
 export const App = () => {
   const [isSingUp, setSingUp] = useState<boolean>(true)
-
-  useEffect(() => {
-    closeSession()
-  }, [])
+  const [user, setUser] = useState<User>()
 
   return (
     <div>
-      <button
-        onClick={() => {
-          setSingUp(true)
-        }}
-      >
-        Sign Up
-      </button>
-      <button
-        onClick={() => {
-          setSingUp(false)
-        }}
-      >
-        Sign In
-      </button>
+      {!user && (
+        <>
+          <button
+            onClick={() => {
+              setSingUp(true)
+            }}
+          >
+            Sign Up
+          </button>
+          <button
+            onClick={() => {
+              setSingUp(false)
+            }}
+          >
+            Sign In
+          </button>
 
-      <SignUp isSignUp={isSingUp} />
+          <Sign setCurrentUser={(user) => setUser(user)} isSignUp={isSingUp} />
+        </>
+      )}
+      {user && (
+        <>
+          <Header user={user} />
+          <UserPage />
+        </>
+      )}
     </div>
   )
 }
