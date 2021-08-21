@@ -1,26 +1,32 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useState, useEffect } from 'react'
+import { SignUp } from './components'
+import { closeSession } from './service/session'
 
-function App() {
+export const App = () => {
+  const [isSingUp, setSingUp] = useState<boolean>(true)
+
+  useEffect(() => {
+    closeSession()
+  }, [])
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
-}
+    <div>
+      <button
+        onClick={() => {
+          setSingUp(true)
+        }}
+      >
+        Sign Up
+      </button>
+      <button
+        onClick={() => {
+          setSingUp(false)
+        }}
+      >
+        Sign In
+      </button>
 
-export default App;
+      <SignUp isSignUp={isSingUp} />
+    </div>
+  )
+}
