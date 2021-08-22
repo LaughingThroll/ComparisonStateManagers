@@ -13,5 +13,9 @@ export const createSession = (user: SessionDTO) => {
 }
 
 export const closeSession = () => {
-  return makeRequestFavqs<{ message: string }>('session', { method: 'DELETE' })
+  return makeRequestFavqs<{ message: string }>('session', {
+    method: 'DELETE',
+  }).then(() => {
+    localStorage.removeItem('user')
+  })
 }

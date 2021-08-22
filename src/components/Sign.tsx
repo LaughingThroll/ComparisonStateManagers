@@ -51,13 +51,13 @@ export const Sign: React.FC<SignUpProps> = ({ isSignUp, setCurrentUser }) => {
       login,
       password,
     }
-    // localStorage.setItem('user', JSON.stringify(userDTO))
 
     if (isSignUp) {
       createUser({ email, ...userDTO })
     } else {
       getUser(userDTO).then((user) => {
         !unmounted.current && user && setCurrentUser(user)
+        localStorage.setItem('user', JSON.stringify(user))
         resetValue()
       })
     }

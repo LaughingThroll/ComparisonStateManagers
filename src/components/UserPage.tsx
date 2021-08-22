@@ -12,11 +12,11 @@ export const UserPage = () => {
 
   return (
     <div>
-      Your list
+      All list
       <ul>
         {quotes.map((quote) => {
           return (
-            <li style={{ marginBottom: 10 }}>
+            <li key={quote?.id} style={{ marginBottom: 10 }}>
               <div>{quote?.body}</div>
               <div>{quote?.author}</div>
             </li>

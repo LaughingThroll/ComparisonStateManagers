@@ -23,21 +23,14 @@ const getUserHelper = (login: string, token: string) => {
     headers: { 'User-Token': token },
   })
 
-  localStorage.setItem('userToken', token)
   return userResponse
 }
 
 export const getUser = async (user: SessionDTO) => {
-  const userToken = localStorage.getItem('userToken')
-
-  if (userToken) {
-    return getUserHelper(user.login, userToken)
-  }
-
   const response = await createSession(user)
 
   if ('login' in response) {
-    getUserHelper(response.login, response['User-Token'])
+    return getUserHelper(response.login, response['User-Token'])
   }
 
   console.log('error_code in session', response)

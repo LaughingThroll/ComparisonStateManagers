@@ -1,7 +1,11 @@
 import React from 'react'
+import { closeSession } from '../service/session'
 import { User } from '../service/users'
 
-export const Header: React.FC<{ user: User }> = ({ user }) => {
+export const Header: React.FC<{
+  user: User
+  setCurrentUser: (user: User | null) => void
+}> = ({ user, setCurrentUser }) => {
   return (
     <header
       style={{
@@ -16,6 +20,14 @@ export const Header: React.FC<{ user: User }> = ({ user }) => {
         src={user.pic_url}
         alt={user.login}
       />
+      <button
+        onClick={() => {
+          closeSession()
+          setCurrentUser(null)
+        }}
+      >
+        Exit
+      </button>
     </header>
   )
 }
