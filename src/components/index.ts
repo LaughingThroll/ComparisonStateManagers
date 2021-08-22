@@ -1,3 +1,3 @@
 export { Sign } from './Sign'
-export { UserPage } from './UserPage'
+export { QuotesList } from './QuotesList'
 export { Header } from './Header'

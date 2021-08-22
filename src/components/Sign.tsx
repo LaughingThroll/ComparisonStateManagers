@@ -1,26 +1,14 @@
-import React, {
-  useState,
-  useEffect,
-  ChangeEvent,
-  MouseEvent,
-  useRef,
-} from 'react'
-import { createUser, getUser, User } from '../service/users'
+import React, { useState, ChangeEvent, MouseEvent } from 'react'
+import { authorizationStore } from './../store/Authorization'
 import { SessionDTO } from '../service/types'
+import { SignStore } from '../store/Sign'
+import { observer } from 'mobx-react-lite'
 
 interface SignUpProps {
-  isSignUp: boolean
-  setCurrentUser: (user: User) => void
+  signUp: SignStore
 }
 
-export const Sign: React.FC<SignUpProps> = ({ isSignUp, setCurrentUser }) => {
-  const unmounted = useRef(false)
-  useEffect(() => {
-    return () => {
-      unmounted.current = true
-    }
-  }, [])
-
+export const Sign: React.FC<SignUpProps> = observer(({ signUp }) => {
   const [formValues, setFormValue] = useState<{
     [key: string]: string
   }>({
@@ -52,35 +40,17 @@ export const Sign: React.FC<SignUpProps> = ({ isSignUp, setCurrentUser }) => {
       password,
     }
 
-    if (isSignUp) {
-      createUser({ email, ...userDTO })
+    if (signUp.signUp) {
+      authorizationStore.createUser({ email, ...userDTO }).then(() => resetValue())
     } else {
-      getUser(userDTO).then((user) => {
-        !unmounted.current && user && setCurrentUser(user)
-        localStorage.setItem('user', JSON.stringify(user))
-        resetValue()
-      })
+      authorizationStore.getUser(userDTO).then(() => resetValue())
     }
   }
 
   return (
     <form>
-      <input
-        value={login}
-        name="login"
-        onChange={handleOnChange}
-        type="text"
-        placeholder="Name"
-      />
-      {isSignUp && (
-        <input
-          value={email}
-          name="email"
-          onChange={handleOnChange}
-          type="text"
-          placeholder="Email"
-        />
-      )}
+      <input value={login} name="login" onChange={handleOnChange} type="text" placeholder="Name" />
+      {signUp.signUp && <input value={email} name="email" onChange={handleOnChange} type="text" placeholder="Email" />}
       <input
         value={password}
         name="password"
@@ -91,13 +61,9 @@ export const Sign: React.FC<SignUpProps> = ({ isSignUp, setCurrentUser }) => {
         placeholder="Password"
       />
 
-      <button
-        type="submit"
-        onClick={onSubmit}
-        disabled={!login || (isSignUp && !email) || !password}
-      >
-        Sign {isSignUp ? 'Up' : 'In'}{' '}
+      <button type="submit" onClick={onSubmit} disabled={!login || (signUp.signUp && !email) || !password}>
+        {signUp.signPhrase}
       </button>
     </form>
   )
-}
+})

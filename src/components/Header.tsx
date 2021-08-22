@@ -1,11 +1,9 @@
 import React from 'react'
-import { closeSession } from '../service/session'
-import { User } from '../service/users'
+import { observer } from 'mobx-react-lite'
+import { User } from '../store/Authorization'
+import { SessionStore } from './../store/Session'
 
-export const Header: React.FC<{
-  user: User
-  setCurrentUser: (user: User | null) => void
-}> = ({ user, setCurrentUser }) => {
+export const Header: React.FC<{ user: User | null; session: SessionStore }> = observer(({ user, session }) => {
   return (
     <header
       style={{
@@ -14,20 +12,9 @@ export const Header: React.FC<{
         alignItems: 'center',
       }}
     >
-      <div>{user.login}</div>
-      <img
-        style={{ display: 'block', width: 60, height: 60, marginLeft: 10 }}
-        src={user.pic_url}
-        alt={user.login}
-      />
-      <button
-        onClick={() => {
-          closeSession()
-          setCurrentUser(null)
-        }}
-      >
-        Exit
-      </button>
+      <div>{user?.login}</div>
+      <img style={{ display: 'block', width: 60, height: 60, marginLeft: 10 }} src={user?.pic_url} alt={user?.login} />
+      <button onClick={session.closeSession}>Exit</button>
     </header>
   )
-}
+})

@@ -1,47 +1,47 @@
-import React, { useState, useEffect } from 'react'
-import { Sign, UserPage, Header } from './components'
-import { User } from './service/users'
+import React, { useEffect } from 'react'
+import { observer } from 'mobx-react-lite'
+import { Sign, QuotesList, Header } from './components'
+import { AuthorizationStore } from './store/Authorization'
+import { SignStore } from './store/Sign'
+import { sessionStore } from './store/Session'
+import { qoutesStore } from './store/Quotes'
 
-export const App = () => {
-  const [isSingUp, setSingUp] = useState<boolean>(true)
-  const [user, setUser] = useState<User | null>(null)
+export const App: React.FC<{ authorization: AuthorizationStore; sign: SignStore }> = observer(
+  ({ authorization, sign }) => {
+    useEffect(() => {
+      authorization.getUserLocal()
+    }, [authorization])
 
-  useEffect(() => {
-    const localUser = localStorage.getItem('user')
+    return (
+      <div>
+        {!authorization.user && (
+          <>
+            <button
+              onClick={() => {
+                sign.setSignUp(true)
+              }}
+            >
+              Sign Up
+            </button>
+            <button
+              onClick={() => {
+                sign.setSignUp(false)
+              }}
+            >
+              Sign In
+            </button>
 
-    if (localUser) {
-      setUser(JSON.parse(localUser))
-    }
-  }, [])
+            <Sign signUp={sign} />
+          </>
+        )}
 
-  return (
-    <div>
-      {!user && (
-        <>
-          <button
-            onClick={() => {
-              setSingUp(true)
-            }}
-          >
-            Sign Up
-          </button>
-          <button
-            onClick={() => {
-              setSingUp(false)
-            }}
-          >
-            Sign In
-          </button>
-
-          <Sign setCurrentUser={setUser} isSignUp={isSingUp} />
-        </>
-      )}
-      {user && (
-        <>
-          <Header setCurrentUser={setUser} user={user} />
-          <UserPage />
-        </>
-      )}
-    </div>
-  )
-}
+        {authorization.user && (
+          <>
+            <Header session={sessionStore} user={authorization.user} />
+            <QuotesList quotes={qoutesStore} />
+          </>
+        )}
+      </div>
+    )
+  }
+)
