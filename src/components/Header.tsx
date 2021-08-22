@@ -1,9 +1,11 @@
 import React from 'react'
 import { observer } from 'mobx-react-lite'
-import { User } from '../store/Authorization'
-import { SessionStore } from './../store/Session'
+import { authorizationStore } from '../store/Authorization'
 
-export const Header: React.FC<{ user: User | null; session: SessionStore }> = observer(({ user, session }) => {
+// It's way bad for unit-testing
+export const Header: React.FC = observer(() => {
+  const { user, closeSession } = authorizationStore
+
   return (
     <header
       style={{
@@ -14,7 +16,7 @@ export const Header: React.FC<{ user: User | null; session: SessionStore }> = ob
     >
       <div>{user?.login}</div>
       <img style={{ display: 'block', width: 60, height: 60, marginLeft: 10 }} src={user?.pic_url} alt={user?.login} />
-      <button onClick={session.closeSession}>Exit</button>
+      <button onClick={closeSession}>Exit</button>
     </header>
   )
 })

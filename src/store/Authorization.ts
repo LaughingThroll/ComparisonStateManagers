@@ -1,7 +1,10 @@
 import { makeAutoObservable, runInAction } from 'mobx'
 import { makeRequestFavqs } from '../service/makeRequestFavqs'
-import { sessionStore } from './Session'
 import { SuccessLogin, ServerError, UserLogin, SessionDTO } from './../service/types'
+
+interface SuccessSession extends SuccessLogin {
+  email: string
+}
 
 export interface User {
   login: string
@@ -14,7 +17,8 @@ export interface User {
 
 export class AuthorizationStore {
   user: User | null = null
-  isLoading: boolean | null = null
+  isLoading: boolean = true
+  error: ServerError | null = null
 
   constructor() {
     makeAutoObservable(this)
@@ -28,9 +32,9 @@ export class AuthorizationStore {
   }
 
   async getUser(user: SessionDTO) {
-    // Direct Dependency session
     this.isLoading = true
-    const response = await sessionStore.createSession(user)
+
+    const response = await this.createSession(user)
 
     if ('login' in response) {
       const userResponse = await this.getUserHelper(response.login, response['User-Token'])
@@ -44,7 +48,11 @@ export class AuthorizationStore {
       return
     }
 
-    console.log('error_code in session', response)
+    runInAction(() => {
+      this.error = response
+    })
+
+    console.error('error_code in session')
   }
 
   getUserLocal() {
@@ -53,8 +61,28 @@ export class AuthorizationStore {
     if (localUser) {
       runInAction(() => {
         this.user = JSON.parse(localUser)
+        this.isLoading = false
       })
     }
+  }
+
+  createSession = (user: SessionDTO) => {
+    return makeRequestFavqs<SuccessSession | ServerError>('session', {
+      method: 'POST',
+      body: JSON.stringify({ user }),
+    })
+  }
+
+  closeSession = () => {
+    return makeRequestFavqs<{ message: string }>('session', {
+      method: 'DELETE',
+    }).then(() => {
+      runInAction(() => {
+        this.user = null
+        this.isLoading = true
+      })
+      localStorage.removeItem('user')
+    })
   }
 
   private getUserHelper = async (login: string, token: string) => {

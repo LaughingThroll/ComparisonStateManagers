@@ -1,4 +1,4 @@
-import { makeAutoObservable, runInAction } from 'mobx'
+import { action, computed, flow, makeObservable, observable, runInAction } from 'mobx'
 import { makeRequestFavqs } from './../service/makeRequestFavqs'
 
 interface WrapperQuotes {
@@ -25,15 +25,35 @@ export class QuotesStore {
   quotes: Quote[] = []
 
   constructor() {
-    makeAutoObservable(this)
+    makeObservable(this, {
+      quotes: observable,
+      addQuote: action,
+      getQuotes: flow,
+      moreQuotes: computed,
+    })
   }
 
-  async getQuotes(page?: number) {
-    const response = await makeRequestFavqs<WrapperQuotes>(`quotes?page=${page || 1}`)
+  *getQuotes(page?: number) {
+    const response: WrapperQuotes = yield makeRequestFavqs<WrapperQuotes>(`quotes?page=${page || 1}`)
+
     runInAction(() => {
       this.quotes = response.quotes
     })
   }
+
+  addQuote = () => {
+    const quote: Partial<Quote> = {
+      id: 45678987,
+      body: 'Maybe better be than not be, but i can wrong',
+      author: 'Kostia',
+    }
+
+    this.quotes.unshift(quote as Quote)
+  }
+
+  get moreQuotes() {
+    return this.quotes.length <= 30
+  }
 }
 
-export const qoutesStore = new QuotesStore()
+export const quotesStore = new QuotesStore()
