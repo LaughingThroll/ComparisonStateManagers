@@ -1,25 +1,15 @@
-import React, {
-  useState,
-  useEffect,
-  ChangeEvent,
-  MouseEvent,
-  useRef,
-} from 'react'
-import { createUser, getUser, User } from '../service/users'
+import React, { useState, ChangeEvent, MouseEvent } from 'react'
+import { createUser } from '../service/users'
 import { SessionDTO } from '../service/types'
+import { fetchUser } from './../store/features/user/userSlice'
+import { useAppDispatch } from './../hooks'
 
 interface SignUpProps {
   isSignUp: boolean
-  setCurrentUser: (user: User) => void
 }
 
-export const Sign: React.FC<SignUpProps> = ({ isSignUp, setCurrentUser }) => {
-  const unmounted = useRef(false)
-  useEffect(() => {
-    return () => {
-      unmounted.current = true
-    }
-  }, [])
+export const Sign: React.FC<SignUpProps> = ({ isSignUp }) => {
+  const dispatch = useAppDispatch()
 
   const [formValues, setFormValue] = useState<{
     [key: string]: string
@@ -55,12 +45,9 @@ export const Sign: React.FC<SignUpProps> = ({ isSignUp, setCurrentUser }) => {
     if (isSignUp) {
       createUser({ email, ...userDTO })
     } else {
-      getUser(userDTO).then((user) => {
-        !unmounted.current && user && setCurrentUser(user)
-        localStorage.setItem('user', JSON.stringify(user))
-        resetValue()
-      })
+      dispatch(fetchUser(userDTO))
     }
+    resetValue()
   }
 
   return (

@@ -29,9 +29,5 @@ const getUserHelper = (login: string, token: string) => {
 export const getUser = async (user: SessionDTO) => {
   const response = await createSession(user)
 
-  if ('login' in response) {
-    return getUserHelper(response.login, response['User-Token'])
-  }
-
-  console.log('error_code in session', response)
+  return getUserHelper(response.login, response['User-Token'])
 }

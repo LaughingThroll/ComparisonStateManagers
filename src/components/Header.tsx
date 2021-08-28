@@ -1,11 +1,14 @@
 import React from 'react'
-import { closeSession } from '../service/session'
+import { useAppDispatch } from '../hooks'
+
+import { exitUser } from './../store/features/user/userSlice'
 import { User } from '../service/users'
 
 export const Header: React.FC<{
-  user: User
-  setCurrentUser: (user: User | null) => void
-}> = ({ user, setCurrentUser }) => {
+  user: User | null
+}> = ({ user }) => {
+  const dispatch = useAppDispatch()
+
   return (
     <header
       style={{
@@ -14,16 +17,15 @@ export const Header: React.FC<{
         alignItems: 'center',
       }}
     >
-      <div>{user.login}</div>
+      <div>{user?.login}</div>
       <img
         style={{ display: 'block', width: 60, height: 60, marginLeft: 10 }}
-        src={user.pic_url}
-        alt={user.login}
+        src={user?.pic_url}
+        alt={user?.login}
       />
       <button
         onClick={() => {
-          closeSession()
-          setCurrentUser(null)
+          dispatch(exitUser())
         }}
       >
         Exit
