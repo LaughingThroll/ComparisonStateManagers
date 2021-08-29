@@ -1,7 +1,7 @@
 import React from 'react'
 import { useAppDispatch } from '../hooks'
 
-import { exitUser } from './../store/features/user/userSlice'
+import { exitUser } from './../store/slices/user/userSlice'
 import { User } from '../service/users'
 
 export const Header: React.FC<{

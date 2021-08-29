@@ -1,6 +1,7 @@
 import { makeRequestFavqs } from './makeRequestFavqs'
+import { ServerError } from './types'
 
-interface WrapperQuotes {
+export interface WrapperQuotes {
   page: number
   last_page: boolean
   quotes: Quote[]
@@ -21,5 +22,7 @@ export interface Quote {
 }
 
 export const getQuotes = (page?: number) => {
-  return makeRequestFavqs<WrapperQuotes>(`quotes?page=${page || 1}`)
+  return makeRequestFavqs<WrapperQuotes | ServerError>(
+    `quotes?page=${page || 1}`
+  )
 }

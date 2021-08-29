@@ -1,17 +1,12 @@
 import React, { useState, useEffect } from 'react'
 import { Sign, UserPage, Header } from './components'
-import { User } from './service/users'
 import { useAppSelector, useAppDispatch } from './hooks'
-import { getLocalUser } from './store/features/user/userSlice'
+import { getLocalUser, selectUser } from './store/slices/user/userSlice'
 
 export const App = () => {
   const dispatch = useAppDispatch()
   const [isSingUp, setSingUp] = useState<boolean>(true)
-  const {
-    user: userRedux,
-    isLoaded,
-    error,
-  } = useAppSelector((state) => state.user)
+  const { user, isLoaded, error } = useAppSelector(selectUser)
 
   useEffect(() => {
     dispatch(getLocalUser())
@@ -19,7 +14,7 @@ export const App = () => {
 
   return (
     <div>
-      {!userRedux && (
+      {!user && (
         <>
           <button
             onClick={() => {
@@ -39,9 +34,9 @@ export const App = () => {
           <Sign isSignUp={isSingUp} />
         </>
       )}
-      {userRedux && (
+      {user && (
         <>
-          <Header user={userRedux} />
+          <Header user={user} />
           <UserPage />
         </>
       )}

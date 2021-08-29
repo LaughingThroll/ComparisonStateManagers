@@ -1,6 +1,6 @@
 import { makeRequestFavqs } from './makeRequestFavqs'
 import { createSession } from './session'
-import { SuccessLogin, ServerError, UserLogin, SessionDTO } from './types'
+import { SuccessLogin, UserLogin, SessionDTO, ServerError } from './types'
 
 export interface User {
   login: string
@@ -19,7 +19,7 @@ export const createUser = (user: UserLogin) => {
 }
 
 const getUserHelper = (login: string, token: string) => {
-  const userResponse = makeRequestFavqs<User>(`users/${login}`, {
+  const userResponse = makeRequestFavqs<User | ServerError>(`users/${login}`, {
     headers: { 'User-Token': token },
   })
 

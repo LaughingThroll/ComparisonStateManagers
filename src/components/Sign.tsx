@@ -1,7 +1,6 @@
 import React, { useState, ChangeEvent, MouseEvent } from 'react'
-import { createUser } from '../service/users'
 import { SessionDTO } from '../service/types'
-import { fetchUser } from './../store/features/user/userSlice'
+import { fetchUser, makeUser } from './../store/slices/user/userSlice'
 import { useAppDispatch } from './../hooks'
 
 interface SignUpProps {
@@ -43,7 +42,7 @@ export const Sign: React.FC<SignUpProps> = ({ isSignUp }) => {
     }
 
     if (isSignUp) {
-      createUser({ email, ...userDTO })
+      dispatch(makeUser({ email, ...userDTO }))
     } else {
       dispatch(fetchUser(userDTO))
     }

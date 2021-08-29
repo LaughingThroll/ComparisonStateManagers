@@ -1,12 +1,26 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import { closeSession } from '../../../service/session'
-import { ServerError, SessionDTO } from '../../../service/types'
 import { getUser, createUser, User } from './../../../service/users'
+import {
+  ServerError,
+  SessionDTO,
+  SuccessLogin,
+  UserLogin,
+} from '../../../service/types'
+import { RootState } from '../../store'
 
 interface InitialState {
   user: User | null
+  userLogin: SuccessLogin | null
   error: string
   isLoaded: boolean
+}
+
+const initialState: InitialState = {
+  user: null,
+  error: '',
+  isLoaded: false,
+  userLogin: null,
 }
 
 export const fetchUser = createAsyncThunk<
@@ -16,12 +30,27 @@ export const fetchUser = createAsyncThunk<
 >('user/fetchUser', async (session, { rejectWithValue, dispatch }) => {
   dispatch(resetLoaded())
 
-  try {
-    const user = await getUser(session)
+  const user = await getUser(session)
+
+  if ('login' in user) {
     return user
-  } catch (e) {
-    return rejectWithValue(e)
   }
+
+  return rejectWithValue(user)
+})
+
+export const makeUser = createAsyncThunk<
+  SuccessLogin,
+  UserLogin,
+  { rejectValue: ServerError }
+>('user/makeUser', async (userLogin: UserLogin, { rejectWithValue }) => {
+  const response = await createUser(userLogin)
+
+  if ('login' in response) {
+    return response
+  }
+
+  return rejectWithValue(response)
 })
 
 export const exitUser = createAsyncThunk<void, void>(
@@ -31,12 +60,6 @@ export const exitUser = createAsyncThunk<void, void>(
     return
   }
 )
-
-const initialState: InitialState = {
-  user: null,
-  error: '',
-  isLoaded: false,
-}
 
 const userSlice = createSlice({
   name: 'user',
@@ -68,6 +91,17 @@ const userSlice = createSlice({
       state.error = String(action.payload?.message)
     })
 
+    builder.addCase(makeUser.fulfilled, (state, action) => {
+      state.userLogin = action.payload
+      state.isLoaded = true
+      state.error = ''
+    })
+
+    builder.addCase(makeUser.rejected, (state, action) => {
+      state.error = String(action.payload?.message)
+      state.isLoaded = true
+    })
+
     builder.addCase(exitUser.fulfilled, (state) => {
       localStorage.removeItem('user')
 
@@ -82,6 +116,8 @@ const userSlice = createSlice({
     })
   },
 })
+
+export const selectUser = (state: RootState) => state.user
 
 export const { resetLoaded, getLocalUser } = userSlice.actions
 export const userReducer = userSlice.reducer

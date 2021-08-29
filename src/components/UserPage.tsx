@@ -1,16 +1,19 @@
-import React, { useEffect, useState } from 'react'
-import { getQuotes, Quote } from '../service/quotes'
+import React, { useEffect } from 'react'
+import { useAppSelector, useAppDispatch } from '../hooks'
+
+import { fecthQuotes, selectQuotes } from '../store/slices/quotes/quotesSlice'
 
 export const UserPage = () => {
-  const [quotes, setQuotes] = useState<Quote[]>([])
+  const dispatch = useAppDispatch()
+  const { quotes, isLoaded, error } = useAppSelector(selectQuotes)
 
   useEffect(() => {
-    getQuotes().then((res) => {
-      setQuotes(res.quotes)
-    })
-  }, [])
+    dispatch(fecthQuotes())
+  }, [dispatch])
 
-  return (
+  return !isLoaded ? (
+    <div>Loading...</div>
+  ) : (
     <div>
       All list
       <ul>
@@ -23,6 +26,7 @@ export const UserPage = () => {
           )
         })}
       </ul>
+      {error && <div>{error}</div>}
     </div>
   )
 }

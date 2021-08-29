@@ -1,9 +1,11 @@
 import { configureStore } from '@reduxjs/toolkit'
-import { userReducer } from './features/user/userSlice'
+import { quotesReducer } from './slices/quotes/quotesSlice'
+import { userReducer } from './slices/user/userSlice'
 
 export const store = configureStore({
   reducer: {
     user: userReducer,
+    quotes: quotesReducer,
   },
 })
 
