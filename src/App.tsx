@@ -6,7 +6,7 @@ import { getLocalUser, selectUser } from './store/slices/user/userSlice'
 export const App = () => {
   const dispatch = useAppDispatch()
   const [isSingUp, setSingUp] = useState<boolean>(true)
-  const { user, isLoaded, error } = useAppSelector(selectUser)
+  const { user, error } = useAppSelector(selectUser)
 
   useEffect(() => {
     dispatch(getLocalUser())

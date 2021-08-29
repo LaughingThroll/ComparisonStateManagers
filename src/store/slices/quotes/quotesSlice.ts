@@ -38,6 +38,15 @@ const quotesSlice = createSlice({
     resetLoaded: (state) => {
       state.isLoaded = false
     },
+
+    addQuote: (state) => {
+      const quote = {
+        body: "This world for you. You free. Please don't forget this thing",
+        author: 'Kostia',
+      } as Quote
+
+      state.quotes = [quote, ...state.quotes]
+    },
   },
   extraReducers: (builder) => {
     builder.addCase(fecthQuotes.fulfilled, (state, action) => {
@@ -55,5 +64,5 @@ const quotesSlice = createSlice({
 
 export const selectQuotes = (state: RootState) => state.quotes
 
-export const { resetLoaded } = quotesSlice.actions
+export const { resetLoaded, addQuote } = quotesSlice.actions
 export const quotesReducer = quotesSlice.reducer
